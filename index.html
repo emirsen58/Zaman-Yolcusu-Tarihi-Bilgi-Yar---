@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Zaman Yolcusu: Tarih Yarışı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Zaman Yolcusu: Tarih Yarışı</h1>
+
+    <div id="menu">
+      <input type="text" id="username" placeholder="İsminizi girin" />
+      <button onclick="startGame()">Oyunu Başlat</button>
+      <p>En Yüksek Skor: <span id="highScore">0</span></p>
+    </div>
+
+    <div id="game" class="hidden">
+      <h2 id="eraTitle"></h2>
+      <div id="questionArea"></div>
+      <div id="feedback"></div>
+      <button id="nextButton" class="hidden" onclick="nextStage()">Sonraki Bölüm</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
