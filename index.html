@@ -1,10 +1,155 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Zaman Yolcusu: Tarih Yarışı</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1b1b2f;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      background: linear-gradient(135deg, #1b1b2f 0%, #3a3a6e 100%);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #00ffff;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(45deg, #00ffff, #0077ff);
+      color: white;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0, 255, 255, 0.4);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0, 255, 255, 0.7);
+    }
+
+    button:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 4px rgba(0, 255, 255, 0.9);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #00ffff;
+      background: #222244;
+      color: white;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 8px #00ffff;
+    }
+
+    .fade {
+      animation: fadein 0.3s;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    #feedback {
+      font-size: 1.2em;
+      margin-top: 15px;
+      min-height: 1.5em;
+      transition: color 0.3s ease;
+    }
+
+    #feedback.correct {
+      color: #00ff00;
+      animation: pop 0.5s ease forwards;
+    }
+
+    #feedback.wrong {
+      color: #ff3300;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.3);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      20%,
+      60% {
+        transform: translateX(-10px);
+      }
+      40%,
+      80% {
+        transform: translateX(10px);
+      }
+    }
+
+    /* Background animated stars */
+    @keyframes starTwinkle {
+      0%,
+      100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+      opacity: 0.2;
+      animation: starTwinkle 3s infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -23,6 +168,269 @@
       <button id="nextButton" class="hidden" onclick="nextStage()">Sonraki Bölüm</button>
     </div>
   </div>
-  <script src="script.js"></script>
+  <script>
+    const eras = [
+      {
+        title: "🏺 Antik Mısır",
+        type: "quiz",
+        question: "Mısır piramitlerini kimler inşa etti?",
+        options: ["Uzaylılar", "Firavun işçileri", "Romalılar", "Hititler"],
+        answer: 1,
+      },
+      {
+        title: "🦕 Taş Devri",
+        type: "reflex",
+        description: "Dinozor saldırısından kaçmak için hemen bas!",
+        timeout: 1500,
+      },
+      {
+        title: "🤖 Gelecek 2100",
+        type: "memory",
+        sequence: ["🔴", "🟢", "🔵", "🟡"],
+      },
+      {
+        title: "⚔️ Orta Çağ",
+        type: "quiz",
+        question: "Orta Çağ'da şövalyelerin ana görevi neydi?",
+        options: ["Ticaret yapmak", "Savaşmak ve korumak", "Tarım yapmak", "Sanat yapmak"],
+        answer: 1,
+      },
+      {
+        title: "🧩 Bulmaca Zamanı",
+        type: "puzzle",
+        description: "Doğru sırayla sayıları tıkla: 1, 2, 3, 4",
+        sequence: [1, 2, 3, 4],
+      },
+      {
+        title: "🌍 Rönesans",
+        type: "quiz",
+        question: "Rönesans dönemi hangi yüzyılda başladı?",
+        options: ["14. yüzyıl", "15. yüzyıl", "16. yüzyıl", "17. yüzyıl"],
+        answer: 1,
+      },
+      {
+        title: "🚀 Uzay Çağı",
+        type: "quiz",
+        question: "İlk insanlı uzay uçuşu hangi yıl gerçekleşti?",
+        options: ["1957", "1961", "1969", "1972"],
+        answer: 1,
+      },
+      {
+        title: "🏛️ Antik Yunan",
+        type: "quiz",
+        question: "Antik Yunan'da demokrasi hangi şehir devletinde doğdu?",
+        options: ["Atina", "Sparta", "Korint", "Delphi"],
+        answer: 0,
+      },
+      {
+        title: "⚡ Sanayi Devrimi",
+        type: "quiz",
+        question: "Sanayi Devrimi hangi ülkede başladı?",
+        options: ["Fransa", "İngiltere", "Almanya", "ABD"],
+        answer: 1,
+      },
+      {
+        title: "🛡️ Vikingler",
+        type: "quiz",
+        question: "Vikingler hangi bölgeden geliyordu?",
+        options: ["İskandinavya", "Alpler", "Pirene Dağları", "Kafkaslar"],
+        answer: 0,
+      },
+      {
+        title: "🕰️ Sanat Tarihi",
+        type: "quiz",
+        question: "Mona Lisa tablosu hangi sanatçıya aittir?",
+        options: ["Michelangelo", "Leonardo da Vinci", "Raphael", "Donatello"],
+        answer: 1,
+      },
+      {
+        title: "🌌 Kozmoloji",
+        type: "quiz",
+        question: "Evrenin genişlediğini kim keşfetti?",
+        options: ["Albert Einstein", "Edwin Hubble", "Isaac Newton", "Galileo Galilei"],
+        answer: 1,
+      },
+      {
+        title: "🏰 Orta Çağ Şövalyeleri",
+        type: "quiz",
+        question: "Şövalyelerin kullandığı zırhın adı nedir?",
+        options: ["Kalkan", "Miğfer", "Zırh", "Kılıç"],
+        answer: 2,
+      },
+    ];
+
+    let currentEra = 0;
+    let score = 0;
+    let username = "";
+    let reflexTimeout;
+    let showTime;
+
+    function startGame() {
+      const inputName = document.getElementById("username").value.trim();
+      if (!inputName) {
+        alert("Lütfen isminizi girin.");
+        return;
+      }
+      username = inputName;
+      document.getElementById("menu").classList.add("hidden");
+      document.getElementById("game").classList.remove("hidden");
+      currentEra = 0;
+      score = 0;
+      showEra();
+    }
+
+    function showEra() {
+      const era = eras[currentEra];
+      const title = document.getElementById("eraTitle");
+      const area = document.getElementById("questionArea");
+      const feedback = document.getElementById("feedback");
+      const nextBtn = document.getElementById("nextButton");
+
+      title.textContent = "⏳ " + era.title;
+      area.innerHTML = "";
+      feedback.textContent = "";
+      nextBtn.classList.add("hidden");
+
+      document.body.classList.add("fade");
+      setTimeout(() => {
+        document.body.classList.remove("fade");
+      }, 300);
+
+      if (era.type === "quiz") {
+        const q = document.createElement("p");
+        q.textContent = era.question;
+        area.appendChild(q);
+        era.options.forEach((opt, i) => {
+          const btn = document.createElement("button");
+          btn.textContent = opt;
+          btn.onclick = () => {
+            if (i === era.answer) {
+              score += 10;
+              feedback.textContent = "✅ Doğru!";
+              nextBtn.classList.remove("hidden");
+            } else {
+              feedback.textContent = "❌ Yanlış! Oyun bitti.";
+              endGame();
+            }
+          };
+          area.appendChild(btn);
+        });
+      } else if (era.type === "reflex") {
+        const msg = document.createElement("p");
+        msg.textContent = "Hazırlan...";
+        area.appendChild(msg);
+
+        setTimeout(() => {
+          msg.textContent = era.description;
+          const btn = document.createElement("button");
+          btn.textContent = "Kaç!";
+          showTime = Date.now();
+          btn.onclick = () => {
+            const reaction = Date.now() - showTime;
+            if (reaction <= era.timeout) {
+              feedback.textContent = `⚡ Hızlı tepki! (${reaction}ms)`;
+              score += 10;
+            } else {
+              feedback.textContent = `😵 Çok yavaş! (${reaction}ms)`;
+            }
+            nextBtn.classList.remove("hidden");
+          };
+          area.appendChild(btn);
+        }, Math.random() * 2000 + 1000);
+      } else if (era.type === "memory") {
+        const seq = era.sequence;
+        const show = document.createElement("div");
+        area.appendChild(show);
+
+        let index = 0;
+        const interval = setInterval(() => {
+          show.textContent = seq[index];
+          index++;
+          if (index >= seq.length) {
+            clearInterval(interval);
+            show.textContent = "Şimdi sırayla tıkla:";
+            const inputArea = document.createElement("div");
+            inputArea.id = "memoryInputs";
+            area.appendChild(inputArea);
+            let userSeq = [];
+            seq.forEach((emoji) => {
+              const btn = document.createElement("button");
+              btn.textContent = emoji;
+              btn.onclick = () => {
+                userSeq.push(emoji);
+                if (userSeq.length === seq.length) {
+                  const correct = seq.every((e, i) => e === userSeq[i]);
+                  if (correct) {
+                    feedback.textContent = "🧠 Harika hafıza!";
+                    score += 10;
+                  } else {
+                    feedback.textContent = "😓 Yanlış sırayla yaptın.";
+                  }
+                  nextBtn.classList.remove("hidden");
+                }
+              };
+              inputArea.appendChild(btn);
+            });
+          }
+        }, 800);
+      } else if (era.type === "puzzle") {
+        const seq = era.sequence;
+        const inputArea = document.createElement("div");
+        inputArea.id = "puzzleInputs";
+        area.appendChild(inputArea);
+        let userSeq = [];
+        seq.forEach((num) => {
+          const btn = document.createElement("button");
+          btn.textContent = num;
+          btn.onclick = () => {
+            userSeq.push(num);
+            if (userSeq.length === seq.length) {
+              const correct = seq.every((e, i) => e === userSeq[i]);
+              if (correct) {
+                feedback.textContent = "🎉 Doğru sırayla tıkladın!";
+                score += 10;
+              } else {
+                feedback.textContent = "😓 Yanlış sırayla tıkladın.";
+              }
+              nextBtn.classList.remove("hidden");
+            }
+          };
+          inputArea.appendChild(btn);
+        });
+      }
+    }
+
+    function nextStage() {
+      currentEra++;
+      if (currentEra < eras.length) {
+        showEra();
+      } else {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      document.getElementById("game").innerHTML = `
+        <h2>🎉 Oyun Bitti!</h2>
+        <p>${username}, Skorun: ${score}</p>
+        <button onclick="restart()">🔁 Tekrar Oyna</button>
+      `;
+      const high = localStorage.getItem("highScore") || 0;
+      if (score > high) {
+        localStorage.setItem("highScore", score);
+        alert("🔥 Yeni rekor!");
+      }
+      document.getElementById("highScore").textContent = Math.max(score, high);
+    }
+
+    function restart() {
+      location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const high = localStorage.getItem("highScore") || 0;
+      document.getElementById("highScore").textContent = high;
+    });
+  </script>
 </body>
 </html>
